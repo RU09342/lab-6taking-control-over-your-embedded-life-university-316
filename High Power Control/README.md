@@ -4,7 +4,7 @@ Before hooking up the microcontroller to the relay input, some tests were perfor
 
 The switching speed of the relay was tested experimented with by running various square waves through the coil coming from the wave generator. There was always a small amount of delay between the input wave and the output wave. This is just due to the mechanical switching of the relay.
 
-![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/commit/3ba7f6c9b4877e8ada4868de48b8222bd3fbdbfe)
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/blob/master/Pictures/scope_3.png)
 
 It was determined that the absolute failure point for the relay came somewhere around 100-200 Hz. It was difficult to identify a clear point where it failed. As the relay began to switch at speeds approaching 100 Hz there was many sources of error. for starters, there was a significant delay between current entering the coil, and the coil switching. Second, at high rates there was a large amount of bouncing that occured at the output of the relay. Both of these effects can be seen below.
 
