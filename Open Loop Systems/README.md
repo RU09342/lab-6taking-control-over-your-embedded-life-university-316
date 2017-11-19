@@ -4,11 +4,11 @@
 
 A circuit was created to simulate how a cooling fan may need to be implemented to cool off a voltage regulator. This circuit can be seen below. 
 
-![Alt Text]()
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/blob/master/Pictures/Open%20loop%20system.png)
 
 A relay was chosen to power the fan with a low-side MOSFET switch on the coil of the relay to enable the MSP430 to control the power. With the fan located and fixed in a certain location relative to the circuit data was collected regarding the duty cycle of the power to the fan, and the temperature that the fan reached. At full power the fan was able to bring the temperature of the regulator down to 51C, and with the fan off the regulator reached 65C. A graph of the relation between duty cycle and temperature can be seen below.
 
-![Alt Text]()
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/blob/master/Pictures/Temperature%20chart.png)
 
 The MSP430FR6989 was chosen for its on-board LCD screen. This LCD screen was used to both display the read temperature in real time, but also as a way to toggle through which temperature you would like to be achieved. The ADC input to the MSP430 is through P8.6. The PWM output to the fan is through P1.3.
 
