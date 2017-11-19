@@ -1,16 +1,39 @@
-# Lab 6: "High Power" Control
-For starters, you will not be dealing with anything that is truly "high power". Instead, what I am considering "high power" is anything with the potential to damage or fry your microcontrollers if you were to drive them directly. The idea behind this part of the lab is to learn how not only to drive things that may require a high voltage or high current, but how to then protect your microcontroller from them.
+# Relays 
 
-## Switching
-Most of you have used one of the types of switching circuits to control the RGB LEDs. For this part of the lab, you need to focus on the different types of switching circuits along with the differences in inductive and resistive loads.
+Before hooking up the microcontroller to the relay input, some tests were performed to test the current draw of the relay coil. This was done by putting voltage from a power supply directly across the coil and slowly raising the voltage until the relay switched. It seemed that it always took about 70 mA at the minimum to trigger the relay, and always took at least 4-5V. For this reason the MSP430 was determined to be insufficient for switching the relay and this was never attempted to prevent destroying the chip.
 
-### Relays
-A relay is a electro-mechanical system which can open and close a switch based on an input. 
-![Relay](https://www.phidgets.com/docs/images/1/1d/3051_1_Relay_Diagram.jpg)
-These are extremely useful in situations where large amounts of current need to flow, such as in automotive applications, but they do have their limits. For starters, since the actuation process requires a constant current, sometimes this can be too much for your processor to handle. Second, a lot of these relays require higher than 3.3V, which limits how you can actually turn these things on and off. Using the MSP430G2553, control the state of a relay to drive a power resistor with +12V. Your README for this part should include a screenshot of the output of your MSP and the voltage across the resistor. Try to figure out the switching speed limitations of the relay experimentally.
+The switching speed of the relay was tested experimented with by running various square waves through the coil coming from the wave generator. There was always a small amount of delay between the input wave and the output wave. This is just due to the mechanical switching of the relay.
 
-### MOSFET Switching
-The MOSFET switch is a very simple circuit which can be used in a multitude of applications. One of the most important features of the MOSFET Switch is the near zero current it takes to switch the MOSFET from an on to an off state. There are two main architectures, low-side and high-side switch, each requiring a different type of MOSFET. Using the MSP430G2553, drive a power resistor with +12V in the same fashion as the relay. Obtain an MSP430G2553 voltage output along with the voltage through the power resistor. Try to figure out the switching speed limitations of the MOSFET experimentally.
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/commit/3ba7f6c9b4877e8ada4868de48b8222bd3fbdbfe)
 
-## Deliverables
-Along with what was asked in each part, you will need to utilize the DMM to determine what the current draw from each switch is and if that falls into spec with the Microcontroller. You need to then come up with the best configuration you can think of using to control something that requires large current, but also protects your processor from damage. The reason I am asking you to do this with just the G2553 is: A) The code is just generating a square wave, and B) this part of the lab runs the highest chance of damaging your parts and we have spare G2553's just in case.
+It was determined that the absolute failure point for the relay came somewhere around 100-200 Hz. It was difficult to identify a clear point where it failed. As the relay began to switch at speeds approaching 100 Hz there was many sources of error. for starters, there was a significant delay between current entering the coil, and the coil switching. Second, at high rates there was a large amount of bouncing that occured at the output of the relay. Both of these effects can be seen below.
+
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/commit/3ba7f6c9b4877e8ada4868de48b8222bd3fbdbfe)
+
+For these reasons a failure frequency was difficult to determine but the reliable frequencies for a relay of this kind is most likely around 100 Hz or less. This leads to the conlusion that relays are effective for lower frequency, higher power implementations.
+
+# Mosfet Switching
+
+MOSFET switches typically work by preventing current to flow when you dont want it. By preventing current to flow you can control when you are actually giving power to a load.
+
+The MOSFET switching was done with two different implementations. The high side implementation required two MOSFETS, an NMOS and a PMOS. The low side switch only required an NMOS. The high side switch was slightly more tricky. This was because interfacing the 3.3v coming out of the microcontroller, with the 12v source voltage on the PMOS proved to require an NMOS inverter. The high side switch circuit is shown below. For this switch, a 0V output from the MSP430 correlated to a 0V output across the load. When the MSP430 was outputting 3.3V, the voltage across the load was about 12V.
+
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/commit/9f91814661921cec0b9592cdc54231eff5d98b3d)
+
+The low side switching circuit proved to be much more simple. All this circuit required was one NMOS in between the resistor and ground. This was easier to interface with because the 3.3V coming from the microcontroller could be control the gate to soource voltage effectively. That circuit is shown below. The voltage levels for the low side switch are the same where a 0V output will create 0V across the load, and 3.3v from the MSP430 will create about 12V across the load.
+
+![Alt Text](https://github.com/RU09342/lab-6taking-control-over-your-embedded-life-university-316/commit/9f91814661921cec0b9592cdc54231eff5d98b3d)
+
+Both of these circuits had nearly the same performance. There was no appreciable current coming out of the microcontroller. Additionally, putting a square wave up to 15MHz couldnt cause the switches to fail. However, the greatest flaw of these switches was their current carrying capability. These MOSFETs being used were only rated at 70 mA, which is far less than the relay. It seems that the MOSFET switch is best suited for low power, high frequncy applications.
+
+# Safe High Power Switching
+
+The MOSFET switch is great for its near-zero current and its fast switching speeds, but it is low power. The relay is great for high power, but cannot be turned on using the MSP430. Therefore, the best high power switch is a combination of these useful devices. A relay which had a low side MOSFET switch across the coil worked very effectively. The circuit is seen below.
+
+![Alt Text]()
+
+This circuit had near zero current draw from the MSP430 but had the high power performance of the relay. Effectively this circuit was the best of both worlds.
+
+# Software
+
+The software created for this section of the lab was extremely simple. The code was just there for testing purposes and generated a square wave. It was generated using the toggle setting on a PWM output on the MSP430G2553. Every few timer cycles the CCR value for the PWM changes, making the frequency go up. This was tested until the relay stopped chaning effectively. Other testing was done using the wave generator in the labs.
